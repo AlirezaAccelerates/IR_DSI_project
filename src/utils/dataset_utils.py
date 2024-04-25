@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from pyserini.search import get_topics, SimpleSearcher
 from nltk.stem import PorterStemmer, WordNetLemmatizer
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 import hashlib
