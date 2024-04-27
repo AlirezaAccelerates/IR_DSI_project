@@ -71,4 +71,9 @@ def plot_pl_logs(log_dir, metric, save_dir):
         print(f"{metric} data not found in logs")
 
 
+def calculate_split_sizes(dataset_size, train_ratio, val_ratio):
+    train_size = int(train_ratio * dataset_size)
+    val_size = int(val_ratio * dataset_size)
+    test_size = dataset_size - train_size - val_size
+    return train_size, val_size, test_size
 

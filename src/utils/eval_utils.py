@@ -253,14 +253,14 @@ def compute_Mean_metrics(model, test_queries, queries, documents, trie_data=None
             top_k_ids = np.array(top_k_beam_search(model, query, trie_data, k=k, max_length=max_length, decode_docid_fn=dataset.decode_docid))
         elif model_type == 'siamese':
             docids_list = np.array(queries[query]['docids_list'])
-            top_k_ids = top_k_docids_siamese(model, queries[query], documents, k=1000)
+            top_k_ids = top_k_docids_siamese(model, queries[query], documents, k=k)
 
         # Compute average precision for the current query
         current_AP = compute_AP(top_k_ids[:k], docids_list)
         # Compute the precision at k
         current_PAK = compute_PAK(top_k_ids[:k], docids_list)
         # Compute the recall at k
-        current_RAK = compute_RAK(top_k_ids, docids_list)
+        current_RAK = compute_RAK(top_k_ids[:k], docids_list)
 
         # Update the running mean
         running_mean_AP = running_mean_AP + (current_AP - running_mean_AP) / (i+1)
