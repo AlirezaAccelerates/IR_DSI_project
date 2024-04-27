@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
-from neural_inverted_index_dsi.src.utils.losses import ContrastiveLoss
+from src.utils.losses import ContrastiveLoss
 
 class SiameseNetwork(pl.LightningModule):
     def __init__(self, input_size, conv_channels):

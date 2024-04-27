@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from neural_inverted_index_dsi.src.utils.losses import ContrastiveLoss
+from src.utils.losses import ContrastiveLoss
 
 class AttentionLayer(nn.Module):
     def __init__(self, input_size):
