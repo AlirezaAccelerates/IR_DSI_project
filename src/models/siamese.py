@@ -9,7 +9,7 @@ class SiameseNetwork(pl.LightningModule):
         self.validation_step_outputs = []
         self.train_step_outputs = []
         self.validation_accuracy_outputs = []
-        dropout_prob = 0.5
+        dropout_prob = 0.50
 
         # Siamese network architecture with Convolutional layers
         self.siamese_network = nn.Sequential(

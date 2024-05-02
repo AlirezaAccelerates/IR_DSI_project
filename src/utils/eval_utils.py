@@ -226,28 +226,35 @@ def compute_PAK(top_k_ids, docids_list):
     '''
     return np.isin(top_k_ids, docids_list).mean()
 
+# Function to compute Discounted Cumulative Gain
+def compute_DCG(recommended, relevant, k=10):
+    relevances = np.array([int(doc_id in relevant) for doc_id in recommended[:k]])
+    discounts = np.log2(np.arange(2, k + 2))  # discounts for positions 2, 3, ..., k+1
+    return (relevances / discounts).sum()
 
-# Mean average precision
+# Function to compute Ideal Discounted Cumulative Gain
+def compute_IDCG(relevant, k=10):
+    ideal_relevances = np.ones(min(len(relevant), k))
+    discounts = np.log2(np.arange(2, k + 2))
+    return (ideal_relevances / discounts).sum()
+
+# Function to compute normalized Discounted Cumulative Gain
+def compute_nDCG(recommended, relevant, k=10):
+    dcg = compute_DCG(recommended, relevant, k)
+    idcg = compute_IDCG(relevant, k)
+    return dcg / idcg if idcg > 0 else 0.0
+
+# Mean average precision, PAK, RAK, and nDCG metrics
 def compute_Mean_metrics(model, test_queries, queries, documents, trie_data=None, dataset=None, k=10, max_length=10, model_type='seq2seq'):
-    '''
-    model: PyTorch model used to compute the next token probabilities.
-    trie_data: Trie data structure.
-    dataset: Dataset object.
-    queries: Dictionary of queries.
-    k: Number of top sequences to return.
-    max_length: Maximum length of the sequences.
-    '''
-    # Initialize running mean average precision
+    # Initialize running metrics
     running_mean_AP = 0.0
     running_mean_PatK = 0
     running_mean_RatK = 0
+    running_mean_nDCG = 0.0
 
     # Iterate over test dataset
     for i, query in enumerate(tqdm(test_queries, desc="Computing Mean Metrics")):
         # Get the list of relevant docids
-        
-
-        # Compute top-k docids for the current query
         if model_type == 'seq2seq':
             docids_list = np.array(queries[dataset.query_ids[query]]['docids_list'])
             top_k_ids = np.array(top_k_beam_search(model, query, trie_data, k=k, max_length=max_length, decode_docid_fn=dataset.decode_docid))
@@ -255,17 +262,17 @@ def compute_Mean_metrics(model, test_queries, queries, documents, trie_data=None
             docids_list = np.array(queries[query]['docids_list'])
             top_k_ids = top_k_docids_siamese(model, queries[query], documents, k=k)
 
-        # Compute average precision for the current query
+        # Compute metrics for the current query
         current_AP = compute_AP(top_k_ids[:k], docids_list)
-        # Compute the precision at k
         current_PAK = compute_PAK(top_k_ids[:k], docids_list)
-        # Compute the recall at k
         current_RAK = compute_RAK(top_k_ids[:k], docids_list)
+        current_nDCG = compute_nDCG(top_k_ids, docids_list)
 
-        # Update the running mean
-        running_mean_AP = running_mean_AP + (current_AP - running_mean_AP) / (i+1)
-        running_mean_PatK = running_mean_PatK + (current_PAK - running_mean_PatK) / (i+1)
-        running_mean_RatK = running_mean_RatK + (current_RAK - running_mean_RatK) / (i+1)
+        # Update the running means
+        running_mean_AP += (current_AP - running_mean_AP) / (i+1)
+        running_mean_PatK += (current_PAK - running_mean_PatK) / (i+1)
+        running_mean_RatK += (current_RAK - running_mean_RatK) / (i+1)
+        running_mean_nDCG += (current_nDCG - running_mean_nDCG) / (i+1)
 
-    # Return the running mean average precision
-    return running_mean_AP, running_mean_PatK, running_mean_RatK
+    # Return the running mean metrics
+    return running_mean_AP, running_mean_PatK, running_mean_RatK, running_mean_nDCG
