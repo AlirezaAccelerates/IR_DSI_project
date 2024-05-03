@@ -1,6 +1,6 @@
 ---
 
-# Information Retrieval Final Project - Neural Inverted Index
+# Information Retrieval Final Project
 
 
 <span style="color: #008800">**Navid Azimi, Alireza Rafiei, Mohammad Hashemi**</span>
