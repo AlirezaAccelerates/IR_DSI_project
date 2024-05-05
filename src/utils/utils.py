@@ -70,6 +70,43 @@ def plot_pl_logs(log_dir, metric, save_dir):
     else:
         print(f"{metric} data not found in logs")
 
+def plot_pl_logs_two(log_dir1, metric1, log_dir2, metric2, save_dir):
+    # Create save directory if it doesn't exist
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Capitalize metric name
+    metric_str1 = ' '.join(word.capitalize() for word in metric1.split('_'))
+    metric_str2 = ' '.join(word.capitalize() for word in metric2.split('_'))
+
+    # Find the event file in the log directory
+    event_file1 = next(file for file in os.listdir(log_dir1) if 'events.out.tfevents' in file)
+    full_path1 = os.path.join(log_dir1, event_file1)
+
+    event_file2 = next(file for file in os.listdir(log_dir2) if 'events.out.tfevents' in file)
+    full_path2 = os.path.join(log_dir2, event_file2)
+
+    # Load the TensorBoard event file
+    ea1 = event_accumulator.EventAccumulator(full_path1)
+    ea1.Reload()
+
+    ea2 = event_accumulator.EventAccumulator(full_path2)
+    ea2.Reload()
+
+    # Extracting the scalar 'loss'
+    if metric1 in ea1.scalars.Keys():
+        metric_df1 = pd.DataFrame(ea1.scalars.Items(metric1))
+        metric_df2 = pd.DataFrame(ea2.scalars.Items(metric2))
+
+        # Plotting
+        plt.figure(figsize=(6, 4))
+        plt.plot(metric_df1['step'], metric_df1['value'], label='Train')
+        plt.plot(metric_df2['step'], metric_df2['value'], label='Validation')
+        plt.xlabel('Steps')
+        plt.ylabel('Loss')
+        plt.legend()
+    else:
+        print(f"{metric1} data not found in logs")
 
 def calculate_split_sizes(dataset_size, train_ratio, val_ratio):
     train_size = int(train_ratio * dataset_size)
