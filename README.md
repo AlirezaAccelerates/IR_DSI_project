@@ -2,7 +2,7 @@
 # Information Retrieval Final Project
 
 
-<span style="color: #008800">**Navid Azimi, Alireza Rafiei, Mohammad Hashemi**</span>
+<span style="color: #008800">**Navid Azimi, Alireza Rafiei**</span>
 
 
 📁 [MS Marco Dataset](https://ir-datasets.com/msmarco-passage.html#msmarco-passage)
